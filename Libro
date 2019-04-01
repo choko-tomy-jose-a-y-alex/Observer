@@ -1,0 +1,95 @@
+import java.util.Observable;
+import java.util.Observer;
+
+class Libro{
+	private String titulo;
+	private String estado;
+
+	public String getTitulo(){
+		return titulo;
+	}
+
+	public void setTitulo(String titulo){
+		this.titulo = titulo;
+	}
+   
+   public String getEstado(){
+		return estado;
+	}
+
+	public void setEstado(String estado){
+		this.estado = estado;
+	}
+   
+}
+
+interface LibroMalEstado{
+
+	public void update();
+}
+
+class Administracion implements Observer{
+    @Override
+
+	public void update(Observable arg0, Object arg1){
+		System.out.println("---Administracion---");
+		System.out.println(arg1);
+		System.out.println("Se envia una queja... \n");
+	}
+}
+
+class Compras implements Observer{
+    @Override
+
+	public void update(Observable arg0, Object arg1){
+		System.out.println("---Compras---");
+		System.out.println(arg1);
+		System.out.println("Se solicita nueva cotizacion... \n");
+	}
+}
+
+class Stock implements Observer{
+    @Override
+
+	public void update(Observable arg0, Object arg1){
+		System.out.println("---Stock---");
+		System.out.println(arg1);
+		System.out.println("Baja... \n");
+	}
+}
+
+class AlarmaLibro extends Observable{
+
+	public void disparaAlarma(Libro libro){
+		setChanged();
+		notifyObservers("El libro : " + libro.getTitulo() + "\t" + "Se encuentra en mal estado");
+
+	}
+}
+
+class Biblioteca{
+
+	public void devuelveLibro(Libro libro){
+		if(libro.getEstado().equals("MAL ESTADO")){
+			AlarmaLibro a = new AlarmaLibro();
+			a.addObserver(new Compras());
+			a.addObserver(new Administracion());
+			a.addObserver(new Stock());
+			a.disparaAlarma(libro);
+		}else{
+			System.out.println("El libro se encuentra en perfectas condiciones");
+		}
+	}	
+}
+
+public class EjObserver{
+
+	public static void main(String []n){
+		Libro libro = new Libro();
+		libro.setTitulo(n[0]);
+		libro.setEstado(n[1]);
+
+		Biblioteca b = new Biblioteca();
+		b.devuelveLibro(libro);
+	}
+}
